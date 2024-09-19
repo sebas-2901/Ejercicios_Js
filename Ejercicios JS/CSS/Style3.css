@@ -18,7 +18,7 @@ body {
     height: 100%; /* Altura del contenedor */
     margin: 0 auto; /* Centra horizontalmente el contenedor */
     position: relative; /* Posiciona el contenedor como relativo para que los elementos hijos puedan posicionarse en relación a él */
-    background: linear-gradient(#97cfd3, transparent) #ffffff; /* Fondo del contenedor con un gradiente azul que se desvanece a blanco */
+    background: linear-gradient(#97cfd3, transparent) #d8d8d8; /* Fondo del contenedor con un gradiente azul que se desvanece a blanco */
     transition: background-color 1s linear; /* Transición suave de color de fondo */
     overflow: hidden; /* Oculta cualquier contenido que desborde el contenedor */
 }
@@ -108,6 +108,15 @@ body {
     background: url(../img/nube.png) no-repeat; /* Fondo de la nube con una imagen de nube */
     background-size: 92px 26px; /* Tamaño del fondo de la imagen */
 }
+.pajaro {
+    width: 50px; /* Ajusta según el tamaño de tu imagen */
+    height: 50px; /* Ajusta según el tamaño de tu imagen */
+    position: absolute;
+    background: url('../img/pajaro.png') no-repeat;
+    background-size: cover;
+    z-index: 1; /* Asegúrate de que esté encima del suelo */
+    animation: animarpajaro 0.5s steps(2) infinite; /* Animación en 2 pasos */
+}
 
 /* Estilo para el texto de la puntuación */
 .score {
@@ -153,5 +162,14 @@ body {
     }
     to {
         background-position-x: -226px; /* Ajusta según el tamaño de tu sprite sheet */
+    }
+}
+
+@keyframes animarpajaro {
+    from{
+        background-position-x: 0px;
+    }
+    to{
+        background-position-x: -125px;
     }
 }
