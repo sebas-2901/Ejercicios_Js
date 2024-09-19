@@ -56,11 +56,19 @@ let minNubeY = 100; // Altura mínima de las nubes
 let nubes = []; // Array para almacenar las nubes
 let velNube = 0.5; // Velocidad de las nubes
 
+var maxPajaroY = 270;
+var minPajaroY = 60;
+var tiempoHastaPajaro = 8; // Tiempo inicial antes de que aparezca el primer pájaro
+var tiempoPajaroMin = 6; // Tiempo mínimo entre la aparición de dos pájaros
+var tiempoPajaroMax = 10; // Tiempo máximo entre la aparición de dos pájaros
+let velpajaro = 1.6; 
+
 // Elementos del DOM
 let contenedor;
 let dino;
 let textoScore;
 let suelo;
+let pajaros = []; // Array para almacenar los pájaros
 let gameOver;
 
 // Función para inicializar los elementos del juego
@@ -84,13 +92,17 @@ function Update() {
     MoverObstaculos(); // Mueve los obstáculos
     MoverNubes(); // Mueve las nubes
     DetectarColision(); // Detecta si hay una colisión
+    DecidirCrearPajaros(); // Decide si se debe crear un pájaro
+    MoverPajaros(); // Mueve los pájaros
+    DetectarColision(); // Detecta si hay una colisión con obstáculos
+    DetectarColisionPajaros(); // Detecta si hay una colisión con los pájaros
 
     velY -= gravedad * deltaTime; // Aplica la gravedad al dinosaurio
 }
 
 // Maneja el evento de presionar una tecla
 function HandleKeyDown(ev) {
-    if (ev.keyCode == 32) { // Si se presiona la barra espaciadora
+    if (ev.keyCode == 32 || ev.keyCode == 38) { // Si se presiona la barra espaciadora
         Saltar(); // Llama a la función para hacer saltar al dinosaurio
     }
 }
@@ -106,7 +118,7 @@ function Saltar() {
 
 // Maneja el evento de presionar una tecla
 function HandleKeyDown(ev) {
-    if (ev.keyCode === 32) { // Barra espaciadora para saltar
+    if (ev.keyCode === 32 || ev.keyCode == 38) { // Barra espaciadora para saltar
         Saltar();
     } else if (ev.keyCode === 40) { // Flecha abajo para agacharse
         Agacharse();
@@ -239,6 +251,50 @@ function MoverNubes() {
         } else {
             nubes[i].posX -= CalcularDesplazamiento() * velNube; // Actualiza la posición X de la nube
             nubes[i].style.left = nubes[i].posX + "px"; // Ajusta la posición en el DOM
+        }
+    }
+}
+ // Decide si se debe crear pajaros en función del tiempo transcurrido
+function DecidirCrearPajaros() {
+    tiempoHastaPajaro -= deltaTime;
+    if (tiempoHastaPajaro <= 0) {
+        CrearPajaro();
+    }
+}
+function CrearPajaro() {
+    console.log("Creando pájaro");
+    var pajaro = document.createElement("div");
+    contenedor.appendChild(pajaro);
+    pajaro.classList.add("pajaro");
+    pajaro.posX = contenedor.clientWidth;
+    pajaro.style.left = contenedor.clientWidth + "px";
+    pajaro.style.bottom = minPajaroY + Math.random() * (maxPajaroY - minPajaroY) + "px"; // Establece una posición aleatoria en el eje Y
+    pajaros.push(pajaro); // Añade el pájaro al arreglo de pájaros
+    tiempoHastaPajaro = tiempoPajaroMin + Math.random() * (tiempoPajaroMax - tiempoPajaroMin) / gameVel; // Calcula el tiempo para el próximo pájaro
+}
+function MoverPajaros() {
+    for (var i = pajaros.length - 1; i >= 0; i--) {
+        if (pajaros[i].posX < -pajaros[i].clientWidth) {
+            pajaros[i].parentNode.removeChild(pajaros[i]);
+            pajaros.splice(i, 1);
+        } else {
+            pajaros[i].posX -= CalcularDesplazamiento() * velpajaro;
+            pajaros[i].style.left = pajaros[i].posX + "px";
+            console.log("Moviendo pájaro", pajaros[i].style.left);
+        }
+    }
+}
+
+function DetectarColisionPajaros() {
+    for (var i = 0; i < pajaros.length; i++) {
+        if(pajaros[i].posX > dinoPosX + dino.clientWidth) {
+            // El pájaro está demasiado lejos, no puede colisionar
+            break; //al estar en orden, no puede chocar con más
+        }else{
+            // Cambia obstaculos[i] por pajaros[i]
+            if(IsCollision(dino, pajaros[i], 10, 30, 15, 20)) {
+                GameOver();// Si hay una colisión con un pájaro, termina el juego
+            }
         }
     }
 }
